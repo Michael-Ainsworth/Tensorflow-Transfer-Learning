@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-import tensorflow as tf
 import numpy as np
 import math
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
+from skimage.transform import resize
 
 
 class Data(object):
@@ -12,7 +12,6 @@ class Data(object):
         self.data = cifar10
 
     # Load train and test dataset. Labels are letters. Use one hot encoding to convert labels to binary.
-
     def load_dataset(self):
         
         (X_train, y_train), (X_test, y_test) = self.data.load_data()
@@ -23,6 +22,7 @@ class Data(object):
 
         print('Unique labels include:')
         print(uniqueLabels)
+        print('\n')
 
         y_train = to_categorical(y_train)
         y_test = to_categorical(y_test)
@@ -30,41 +30,69 @@ class Data(object):
         return X_train, y_train, X_test, y_test
 
     
-    # Display size of data
+    def reduceDataSize(self, X_train, y_train, X_test, y_test, fractionOfData):
 
+        stopTrain = math.ceil(len(X_train) * fractionOfData)
+        stopTest = math.ceil(len(X_test) * fractionOfData)
+
+        X_train = X_train[:stopTrain]
+        y_train = y_train[:stopTrain]
+        X_test = X_test[:stopTest]
+        y_test = y_test[:stopTest]
+
+        return X_train, y_train, X_test, y_test
+
+    
+    # Display size of data
     def dataSize(self, X_train, y_train, X_test, y_test):
 
         print('X Train = {},  y train = {}'.format(X_train.shape, y_train.shape))
-        print('X Test = {},  y test = d{}'.format(X_test.shape, y_test.shape))
+        print('X Test = {},  y test = {}'.format(X_test.shape, y_test.shape))
+        print('\n')
         
 
     # Visualize the first n images in the dataset where n is the variable numOfImages
+    def showImages(self, X_train, numOfImages):
 
-    def showImages(self, X_train, y_train, X_test, y_test, numOfImages):
-
-        val = math.ceil(np.sqrt(numOfImages))  # Determine shape of subplot based on images printed
+        # Determine shape of subplot based on images printed
+        val = math.ceil(np.sqrt(numOfImages))  
 
         # Plot each image into the subplot
         for position in range(numOfImages):
-            ax1 = plt.subplot(val,val,position+1)
-            ax1 = plt.imshow(X_train[position])
+            plt.subplot(val,val,position+1)
+            plt.imshow(X_train[position])
         plt.show()
 
 
     # Visualize a specific image number in the dataset
-
-    def showSingleImage(self, X_train, y_train, X_test, y_test, imageNumber):
+    def showSingleImage(self, X_train, imageNumber):
 
         plt.imshow(X_train[imageNumber])
         plt.show()
 
-    
+
+    # Show label for given image number
+    def showLabel(self, y_train, imageNumber):
+
+        return y_train[imageNumber]
+
+
+    # Normalize pixel data to have 0 mean and unit variance
     def normalize(self, X_train, X_test):
+    
+        mean = np.mean(X_train)
+        std = np.std(X_train)
+        
+        X_train = (X_train - mean) / (std)
+        X_test = (X_test - mean) / (std)
+        
+        return X_train, X_test
+    
+    
+    # Upscale data in case of using model with different input shape
+    def upscaleData(self, X_train, X_test, size):
+    
+        X_train_resized = resize(X_train, (X_train.shape[0], size, size, 3))
+        X_test_resized = resize(X_test, (X_test.shape[0], size, size, 3))
 
-        normalizedTrain = X_train.astype(np.float)
-        normalizedTest = X_test.astype(np.float)
-
-        normalizedTrain /= 255
-        normalizedTest /= 255
-
-        return normalizedTrain, normalizedTest
+        return X_train_resized, X_test_resized
