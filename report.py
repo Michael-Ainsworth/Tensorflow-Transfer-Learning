@@ -5,6 +5,9 @@ import sys
 import os
 
 
+# Full report showing the evolution of training loss and accuracy.
+# Figures are plotted and then saved to the Diagnostics directory.
+
 def report(history, model, X_test, y_test): 
      
     losses = pd.DataFrame(model.history.history)
@@ -23,7 +26,7 @@ def report(history, model, X_test, y_test):
     
     my_path = os.path.dirname(os.path.abspath("__file__"))
     my_path = my_path + '/Diagnostics'
-    my_file = 'losses.png'
+    my_file = 'VGG losses.png'
     fig.savefig(os.path.join(my_path, my_file)) 
     
     fig = plt.figure(figsize = (8,6))
@@ -36,7 +39,7 @@ def report(history, model, X_test, y_test):
 
     my_path = os.path.dirname(os.path.abspath("__file__"))
     my_path = my_path + '/Diagnostics'
-    my_file = 'accuracies.png'
+    my_file = 'VGG accuracies.png'
     fig.savefig(os.path.join(my_path, my_file))        
 
     _, accuracy = model.evaluate(X_test, y_test, verbose=0)

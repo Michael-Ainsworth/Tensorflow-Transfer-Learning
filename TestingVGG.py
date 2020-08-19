@@ -5,20 +5,16 @@ import pandas as pd
 import Load_data
 from Load_data import Data
 
-import Model
-from Model import CNN_Model
+import vggModel
+from vggModel import vggModel
 
 import report
 from report import report
 
 
-# Testing class that runs all required functions to train a given model. This specific
-# class trains the CNN model.
+# Testing class for the VGG model
 
-class RunTesting(object):
-
-    # Initialize the fraction of data, the patience, the number of epochs, and the desired
-    # image size of the model to be trained
+class RunTestingVGG(object):
 
     def __init__(self, fractionOfData, patience, epochs, imageSize):
         self.fractionOfData = fractionOfData
@@ -27,10 +23,8 @@ class RunTesting(object):
         self.imageSize = imageSize
         
 
-    # Load dataset, create model, train model, and generate a history of the data.
-    # Also, run the report class to generate graphics on the model training and to save
-    # important variables.
-    
+    # Load dataset, build out the VGG model, train the model, and return a report.
+
     def run(self):
 
         load_cifar = Data()
@@ -48,15 +42,9 @@ class RunTesting(object):
         
         X_train, X_test = load_cifar.normalize(X_train, X_test)
         
-        model = CNN_Model()
-        model.convolutionalBlock(1)
-        model.convolutionalBlock(2)
-        model.convolutionalBlock(4)
-        model.denseLayers()
-        model.modelSummary()
-        
-        modelA = model.compileModel()
-        
+
+        modelA = vggModel()
+
         
         early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=self.patience)
         
